@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabungan Ku Niki</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        .container { max-width: 400px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px; }
+        input, button { margin: 10px; padding: 10px; width: 100%; }
+        .alert { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Tabungan Ku Niki</h2>
+        <p>Target: Rp2.583.650 dalam 153 hari</p>
+        <p>Total Ditabung: Rp <span id="total">0</span></p>
+        <p>Sisa Hari: <span id="sisaHari">153</span></p>
+        <p>Terakhir Menabung: <span id="lastSaved">Belum ada</span></p>
+        <input type="number" id="inputUang" placeholder="Masukkan jumlah uang">
+        <button onclick="tambahTabungan()">Simpan</button>
+        <button onclick="resetWebsite()">Reset</button>
+        <p id="peringatan" class="alert"></p>
+    </div>
+
+    <script>
+        let totalUang = localStorage.getItem("totalUang") ? parseInt(localStorage.getItem("totalUang")) : 0;
+        let hariMenabung = localStorage.getItem("hariMenabung") ? parseInt(localStorage.getItem("hariMenabung")) : 0;
+        let jumlahHarian = localStorage.getItem("jumlahHarian") ? parseInt(localStorage.getItem("jumlahHarian")) : 0;
+        let lastSaved = localStorage.getItem("lastSaved") ? localStorage.getItem("lastSaved") : "Belum ada";
+        const targetUang = 2583650;
+        const targetHari = 153;
+
+        function updateDisplay() {
+            document.getElementById("total").textContent = totalUang;
+            document.getElementById("sisaHari").textContent = Math.max(targetHari - hariMenabung, 0);
+            document.getElementById("lastSaved").textContent = lastSaved;
+            if (hariMenabung > targetHari) {
+                document.getElementById("peringatan").textContent = "⚠️ Anda belum menabung selama lebih dari 153 hari!";
+            } else {
+                document.getElementById("peringatan").textContent = "";
+            }
+        }
+
+        function tambahTabungan() {
+            let uang = parseInt(document.getElementById("inputUang").value);
+            if (!isNaN(uang) && uang > 0) {
+                if (jumlahHarian === 0) {
+                    jumlahHarian = uang; 
+                    localStorage.setItem("jumlahHarian", jumlahHarian);
+                }
+                totalUang += jumlahHarian;
+                hariMenabung++;
+                let now = new Date();
+                let waktuMenabung = now.toLocaleString("id-ID", { timeZone: "Asia/Jakarta" });
+                lastSaved = waktuMenabung;
+                localStorage.setItem("totalUang", totalUang);
+                localStorage.setItem("hariMenabung", hariMenabung);
+                localStorage.setItem("lastSaved", lastSaved);
+                updateDisplay();
+            }
+            document.getElementById("inputUang").value = "";
+        }
+
+        function resetWebsite() {
+            localStorage.clear();
+            location.reload();
+        }
+
+        updateDisplay();
+    </script>
+</body>
+</html>
